@@ -1,0 +1,43 @@
+clear all
+syms k r m L g R
+
+R = 2; L = 400*10e-3; k = 100;
+r = 0.5; m = 500; g = 9.81;
+
+A = [0 1 0;
+     0 0 k/(r*m);
+     0 -k/r -R/L];
+
+B = [0 0;
+    0 -g;
+    1/L 0];
+
+C = [1 0 0];
+d = [0 0];
+
+sys = ss(A,B,C,d);
+
+[tf_num1, tf_den1] = ss2tf(A,B,C,d,1);
+sys_tf1 = tf([0.1 0],tf_den1)
+sys_reduced = balred(sys_tf, 2);
+[tf_num2, tf_den2] = ss2tf(A,B,C,d,2);
+sys_tf2 = tf(tf_num2,tf_den2)
+stepinfo(sys_tf1)
+stepinfo(sys_tf2)
+% sys_reduced = balred(sys_tf,2)
+Co = ctrb(A,B);
+% Display the controllability matrix
+disp('Controllability Matrix:');
+disp(Co);
+
+% Check the rank of the controllability matrix
+rank_Co = rank(Co);
+% disp('Rank of Controllability Matrix:');
+disp(rank_Co);
+
+% Verify controllability
+if rank_Co == size(A, 1)
+    disp('The system is controllable.');
+else
+    disp('The system is not controllable.');
+end
